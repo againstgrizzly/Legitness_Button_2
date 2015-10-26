@@ -26,7 +26,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 /**
  * Created by Brannon on 10/6/2015.
  */
-public class HighScoreScreen implements Screen {
+public class HighScoreScreen implements Screen{
 
     MyGdxGame game;
 
@@ -37,6 +37,9 @@ public class HighScoreScreen implements Screen {
     final float GAME_WORLD_WIDTH = 1080;
     final float GAME_WORLD_HEIGHT = 1920;
     private Stage stage;
+
+    int highScore;
+    int score;
 
     float scale = 1.0f*Gdx.graphics.getWidth()/GAME_WORLD_WIDTH;
 
@@ -180,19 +183,19 @@ public class HighScoreScreen implements Screen {
         //High Score Text
         highScoreTextFont = generator.generateFont(120);
         highScoreTextLabelStyle = new Label.LabelStyle(highScoreTextFont, Color.BLACK);
-        highScoreTextLabel = new Label("HIGH SCORE: " + "91", highScoreTextLabelStyle);
+        highScoreTextLabel = new Label("HIGH SCORE: " + String.valueOf(highScore) , highScoreTextLabelStyle);
         highScoreTextLabel.setAlignment(3);
         highScoreTextLabel.setPosition(540 - highScoreTextLabel.getWidth()/2, 1119 - highScoreTextLabel.getHeight()/2);
 
         //Current Score Text
         currentScoreTextFont = generator.generateFont(535);
         currentScoreTextLabelStyle = new Label.LabelStyle(currentScoreTextFont, Color.RED);
-        currentScoreTextLabel = new Label("182", currentScoreTextLabelStyle);
+        currentScoreTextLabel = new Label(String.valueOf(score), currentScoreTextLabelStyle);
         currentScoreTextLabel.setAlignment(3);
         currentScoreTextLabel.setPosition(540 - currentScoreTextLabel.getWidth()/2, 1422- currentScoreTextLabel.getHeight()/2);
 
 
-        //legitnessSong.play();
+        legitnessSong.play();
         legitnessSong.setLooping(true);
 
         stage.addActor(backgroundReplayImage);

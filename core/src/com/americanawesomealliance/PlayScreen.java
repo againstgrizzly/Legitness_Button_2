@@ -35,9 +35,15 @@ public class PlayScreen implements Screen {
 
 
 
+
     private OrthographicCamera camera;
     private Viewport viewport;
     SpriteBatch batch;
+
+    int highScore;
+
+    BufferedReader in;
+    int universe = 1;
 
     Timer timer;
     Timer.Task task;
@@ -48,7 +54,12 @@ public class PlayScreen implements Screen {
     Timer timer3;
     Timer.Task task3;
 
+    Timer timer4;
+    Timer.Task task4;
+
     HighScoreText highScoreWriter = new HighScoreText();
+
+    int clickCounter = 0;
 
 
     Sound countdownInitial;
@@ -64,6 +75,10 @@ public class PlayScreen implements Screen {
 
     String seconds = "15";
     String tenthSeconds = "00";
+
+    public PlayScreen() {
+
+    }
 
     public String getSeconds() {
         return seconds;
@@ -228,7 +243,7 @@ public class PlayScreen implements Screen {
         playScreenBackgroundImage.setSize(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT);
         /////////////////////////////
 
-        //Play Screen Button///////////////
+        //Play Screen Button///////////////////////////////////////////////////////////////////////////////////////////////
         legitnessButtonTexture = new Texture(Gdx.files.internal("./Main Menu Screen Assets/legitnessButton.png"));
         legitnessButtonTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         legitnessButtonTexturePressed = new Texture(Gdx.files.internal("./Main Menu Screen Assets/legitnessPressedButton.png"));
@@ -237,13 +252,13 @@ public class PlayScreen implements Screen {
         buttonStyle.up = new TextureRegionDrawable(new TextureRegion(legitnessButtonTexture));
         buttonStyle.down = new TextureRegionDrawable(new TextureRegion(legitnessButtonTexturePressed));
         legitnessButton = new Button(buttonStyle);
-        legitnessButton.setSize(530, 530);
+        legitnessButton.setSize(531, 531);
         legitnessButton.setPosition(GAME_WORLD_WIDTH / 2, GAME_WORLD_HEIGHT / 2, 0);
 
         legitnessImage = new Image(legitnessButtonTexture);
-        legitnessImage.setSize(530,530);
+        legitnessImage.setSize(531,531);
         legitnessImage.setPosition(GAME_WORLD_WIDTH / 2, GAME_WORLD_HEIGHT / 2, 0);
-        ////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         rimTexture = new Texture("./Main Menu Screen Assets/buttonRim.png");
         rim = new Image(rimTexture);
@@ -286,7 +301,7 @@ public class PlayScreen implements Screen {
         timeDownLabelStyle = new Label.LabelStyle(ugh, Color.BLACK);
         timeDown = new Label("00:"+seconds+":"+tenthSeconds, timeDownLabelStyle);
         timeDown.setAlignment(3);
-        timeDown.setPosition(GAME_WORLD_WIDTH/2 -400 , GAME_WORLD_HEIGHT*0.75f);
+        timeDown.setPosition(GAME_WORLD_WIDTH/2 -400 , GAME_WORLD_HEIGHT*0.7f);
 
 
 
@@ -316,10 +331,11 @@ public class PlayScreen implements Screen {
         stage.addActor(table);
 
         countdownInitial.play();
-        System.out.println(countdown);
+       // System.out.println(countdown);
 
 
         timer();
+        timer3();
 
     }
 
@@ -343,20 +359,34 @@ public class PlayScreen implements Screen {
         batch.end();
 
         //When the game ends this writes the score to the text file
-       /* if(time == 0){
-            System.out.println("Great Job, Brannon");
+       if(universe == 0){
+           System.out.println(score);
             legitnessButton.remove();
             stage.addActor(legitnessImage);
-            try {
-                highScoreWriter.textWriter(score);
+           try {
+           BufferedReader in = new BufferedReader(new FileReader("./High Score Directory/High Score.txt"));
+               highScore = Integer.valueOf(in.readLine());
+
+               if(score > highScore) {
+
+                   highScoreWriter.textWriter(score);
+               }
+
+               timeDown.remove();
+               timeDown = new Label("00:00:00", timeDownLabelStyle);
+               stage.addActor(timeDown);
+               timeDown.setAlignment(3);
+               timeDown.setPosition(GAME_WORLD_WIDTH/2 -400 , GAME_WORLD_HEIGHT*0.7f);
+               HighScoreScreen hs = new HighScoreScreen(game);
+                game.setScreen(hs);
+
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            time = -1;
-
 
         }
-    */
+
     }
 
     @Override
@@ -384,13 +414,22 @@ public class PlayScreen implements Screen {
 
     }
 
+    public int getClickCounter() {
+        return clickCounter;
+    }
+
+    public void setClickCounter(int clickCounter) {
+        this.clickCounter = clickCounter;
+    }
+
     public void legitnessButtonActionListener() {
         legitnessButton.addListener(new ClickListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("Touch Down");
+                //System.out.println("Touch Down");
                 legitnessSound.stop();
                 legitnessSound.play();
                 score++;
+                clickCounter++;
 
                 if(score < 10) {
                     scoreLabel.remove();
@@ -417,15 +456,18 @@ public class PlayScreen implements Screen {
                 }
 
 
+
+
                 return true;
             }
 
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("Touch Up");
+               // System.out.println("Touch Up");
 
 
             }
         });
+
     }
 
     public void timer() {
@@ -437,7 +479,7 @@ public class PlayScreen implements Screen {
                     countdownInitial.play();
                     label.remove();
                     countdown--;
-                    System.out.println(countdown);
+                    //System.out.println(countdown);
                     label = new Label(String.valueOf(countdown), countdownLabeStyle);
                     label.setAlignment(3);
                     label.setPosition(GAME_WORLD_WIDTH / 2 - label.getWidth() / 2, GAME_WORLD_HEIGHT / 1.2f - label.getHeight() / 2);
@@ -448,7 +490,7 @@ public class PlayScreen implements Screen {
                     countdownFinal.play();
                     label.remove();
                     countdown--;
-                    System.out.println(countdown);
+                   // System.out.println(countdown);
                     label = new Label(String.valueOf(countdown), countdownLabeStyle);
                     label.setAlignment(3);
                     label.setPosition(GAME_WORLD_WIDTH / 2 - label.getWidth() / 2, GAME_WORLD_HEIGHT / 1.2f - label.getHeight() / 2);
@@ -487,7 +529,7 @@ public class PlayScreen implements Screen {
                         setTenthSeconds("99");
                         timeDown = new Label("00:" + getSeconds() + ":" + getTenthSeconds(), timeDownLabelStyle);
                         timeDown.setAlignment(3);
-                        timeDown.setPosition(GAME_WORLD_WIDTH / 2 - 400, GAME_WORLD_HEIGHT * 0.75f);
+                        timeDown.setPosition(GAME_WORLD_WIDTH/2 -400 , GAME_WORLD_HEIGHT*0.7f);
                         stage.addActor(timeDown);
                     }
 
@@ -498,13 +540,19 @@ public class PlayScreen implements Screen {
                         setTenthSeconds(numberZeroer(numberTenth));
                         timeDown = new Label("00:" + getSeconds() + ":" + getTenthSeconds(), timeDownLabelStyle);
                         timeDown.setAlignment(3);
-                        timeDown.setPosition(GAME_WORLD_WIDTH / 2 - 400, GAME_WORLD_HEIGHT * 0.75f);
+                        timeDown.setPosition(GAME_WORLD_WIDTH/2 -400 , GAME_WORLD_HEIGHT*0.7f);
                         stage.addActor(timeDown);
 
                     }
 
                 if(seconds.equals("00")&& tenthSeconds.equals("00")){
                     timer2.stop();
+                    timeDown.remove();
+                    timeDown = new Label("00:00:00", timeDownLabelStyle);
+                   stage.addActor(timeDown);
+                    timeDown.setAlignment(3);
+                    timeDown.setPosition(GAME_WORLD_WIDTH/2 -400 , GAME_WORLD_HEIGHT*0.7f);
+                    universe = 0;
                 }
 
 
@@ -517,12 +565,284 @@ public class PlayScreen implements Screen {
         timer2.scheduleTask(task2,1,0.01f,10000);
     }
 
+    public void timer4(){
+        timer4 = new Timer();
+        task4 = new Timer.Task(){
+            @Override
+            public void run(){
+                timeDown.remove();
+                timeDown = new Label("00:00:00", timeDownLabelStyle);
+                // stage.addActor(timeDown);
+                timeDown.setAlignment(3);
+                timeDown.setPosition(GAME_WORLD_WIDTH/2 -400 , GAME_WORLD_HEIGHT*0.7f);
+                HighScoreScreen highScoreScreen = new HighScoreScreen(game);
+                highScoreScreen.score = score;
+                highScoreScreen.highScore = highScore;
+                game.setScreen(highScoreScreen);
+            }
+
+        };
+        timer4.scheduleTask(task4,1,1,1);
+    }
+
+    public void timer3(){
+        timer3 = new Timer();
+        task3 = new Timer.Task(){
+            @Override
+            public void run(){
+
+                if(getClickCounter() == 0){
+                    ten.remove();
+                    nine.remove();
+                    eight.remove();
+                    seven.remove();
+                    six.remove();
+                    five.remove();
+                    four.remove();
+                    three.remove();
+                    two.remove();
+                    one.remove();
+                    setClickCounter(0);
+                }
+
+                if(getClickCounter() == 1){
+                    ten.remove();
+                    nine.remove();
+                    eight.remove();
+                    seven.remove();
+                    six.remove();
+                    five.remove();
+                    four.remove();
+                    three.remove();
+                    two.remove();
+                    one.remove();
+                    blackBar.remove();
+
+                    stage.addActor(one);
+                    stage.addActor(blackBar);
+                    setClickCounter(0);
+                }
+
+                if(getClickCounter() == 2){
+                    ten.remove();
+                    nine.remove();
+                    eight.remove();
+                    seven.remove();
+                    six.remove();
+                    five.remove();
+                    four.remove();
+                    three.remove();
+                    two.remove();
+                    one.remove();
+                    blackBar.remove();
+
+                    stage.addActor(one);
+                    stage.addActor(two);
+                    stage.addActor(blackBar);
+                    setClickCounter(0);
+                }
+
+                if(getClickCounter() == 3){
+                    ten.remove();
+                    nine.remove();
+                    eight.remove();
+                    seven.remove();
+                    six.remove();
+                    five.remove();
+                    four.remove();
+                    three.remove();
+                    two.remove();
+                    one.remove();
+                    blackBar.remove();
+
+                    stage.addActor(one);
+                    stage.addActor(two);
+                    stage.addActor(three);
+                    stage.addActor(blackBar);
+                    setClickCounter(0);
+                }
+
+                if(getClickCounter() == 4){
+                    ten.remove();
+                    nine.remove();
+                    eight.remove();
+                    seven.remove();
+                    six.remove();
+                    five.remove();
+                    four.remove();
+                    three.remove();
+                    two.remove();
+                    one.remove();
+                    blackBar.remove();
+
+                    stage.addActor(one);
+                    stage.addActor(two);
+                    stage.addActor(three);
+                    stage.addActor(four);
+                    stage.addActor(blackBar);
+                    setClickCounter(0);
+                }
+
+                if(getClickCounter() == 5){
+                    ten.remove();
+                    nine.remove();
+                    eight.remove();
+                    seven.remove();
+                    six.remove();
+                    five.remove();
+                    four.remove();
+                    three.remove();
+                    two.remove();
+                    one.remove();
+                    blackBar.remove();
+
+                    stage.addActor(one);
+                    stage.addActor(two);
+                    stage.addActor(three);
+                    stage.addActor(four);
+                    stage.addActor(five);
+                    stage.addActor(blackBar);
+                    setClickCounter(0);
+                }
+
+                if(getClickCounter() == 6){
+                    ten.remove();
+                    nine.remove();
+                    eight.remove();
+                    seven.remove();
+                    six.remove();
+                    five.remove();
+                    four.remove();
+                    three.remove();
+                    two.remove();
+                    one.remove();
+                    blackBar.remove();
+
+                    stage.addActor(one);
+                    stage.addActor(two);
+                    stage.addActor(three);
+                    stage.addActor(four);
+                    stage.addActor(five);
+                    stage.addActor(six);
+                    stage.addActor(blackBar);
+                    setClickCounter(0);
+                }
+
+                if(getClickCounter() == 7){
+                    ten.remove();
+                    nine.remove();
+                    eight.remove();
+                    seven.remove();
+                    six.remove();
+                    five.remove();
+                    four.remove();
+                    three.remove();
+                    two.remove();
+                    one.remove();
+                    blackBar.remove();
+
+                    stage.addActor(one);
+                    stage.addActor(two);
+                    stage.addActor(three);
+                    stage.addActor(four);
+                    stage.addActor(five);
+                    stage.addActor(six);
+                    stage.addActor(seven);
+                    stage.addActor(blackBar);
+                    setClickCounter(0);
+                }
+
+                if(getClickCounter() == 8){
+                    ten.remove();
+                    nine.remove();
+                    eight.remove();
+                    seven.remove();
+                    six.remove();
+                    five.remove();
+                    four.remove();
+                    three.remove();
+                    two.remove();
+                    one.remove();
+                    blackBar.remove();
+
+                    stage.addActor(one);
+                    stage.addActor(two);
+                    stage.addActor(three);
+                    stage.addActor(four);
+                    stage.addActor(five);
+                    stage.addActor(six);
+                    stage.addActor(seven);
+                    stage.addActor(eight);
+                    stage.addActor(blackBar);
+                    setClickCounter(0);
+                }
+
+                if(getClickCounter() == 9){
+                    ten.remove();
+                    nine.remove();
+                    eight.remove();
+                    seven.remove();
+                    six.remove();
+                    five.remove();
+                    four.remove();
+                    three.remove();
+                    two.remove();
+                    one.remove();
+                    blackBar.remove();
+
+                    stage.addActor(one);
+                    stage.addActor(two);
+                    stage.addActor(three);
+                    stage.addActor(four);
+                    stage.addActor(five);
+                    stage.addActor(six);
+                    stage.addActor(seven);
+                    stage.addActor(eight);
+                    stage.addActor(nine);
+                    stage.addActor(blackBar);
+                    setClickCounter(0);
+                }
+
+                if(getClickCounter() >= 10){
+                    ten.remove();
+                    nine.remove();
+                    eight.remove();
+                    seven.remove();
+                    six.remove();
+                    five.remove();
+                    four.remove();
+                    three.remove();
+                    two.remove();
+                    one.remove();
+                    blackBar.remove();
+
+                    stage.addActor(one);
+                    stage.addActor(two);
+                    stage.addActor(three);
+                    stage.addActor(four);
+                    stage.addActor(five);
+                    stage.addActor(six);
+                    stage.addActor(seven);
+                    stage.addActor(eight);
+                    stage.addActor(nine);
+                    stage.addActor(ten);
+                    stage.addActor(blackBar);
+                    setClickCounter(0);
+                }
+
+
+            }
+
+        };
+        timer3.scheduleTask(task3,0,0.77f,10000);
+    }
+
 
     public void FileReader() throws Exception {
         BufferedReader reader = new BufferedReader(new FileReader("./High Score Directory/High Score.txt"));
         StringBuilder sb = new StringBuilder();
         sb.append(reader.readLine());
-        System.out.println(sb.toString());
+        //System.out.println(sb.toString());
 
 
     }
@@ -542,4 +862,11 @@ public class PlayScreen implements Screen {
     }
 
 
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
 }
