@@ -59,7 +59,7 @@ public class PlayScreen implements Screen {
 
     HighScoreText highScoreWriter = new HighScoreText();
 
-    int clickCounter = 0;
+    static int clickCounter = 0;
 
 
     Sound countdownInitial;
@@ -68,7 +68,7 @@ public class PlayScreen implements Screen {
     //////////
 
     private int counter = 0;
-    private int score = 0;
+    private static int score = 0;
     private int countdown = 3;
 
 
@@ -378,6 +378,7 @@ public class PlayScreen implements Screen {
                timeDown.setAlignment(3);
                timeDown.setPosition(GAME_WORLD_WIDTH/2 -400 , GAME_WORLD_HEIGHT*0.7f);
                HighScoreScreen hs = new HighScoreScreen(game);
+               System.out.println(score);
                 game.setScreen(hs);
 
 

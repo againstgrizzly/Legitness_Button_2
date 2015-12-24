@@ -21,8 +21,7 @@ public class HighScoreText {
     }
 
     public void textWriter(int highScore) throws IOException {
-        Path path = Paths.get("./High Score Directory/High Score.txt");
-        // Files.delete(path);
+
         File temp = new File("./High Score Directory/High Score.txt");
         PrintWriter writer = new PrintWriter(temp);
         writer.print(Integer.toString(highScore));

@@ -23,10 +23,16 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 /**
  * Created by Brannon on 10/6/2015.
  */
-public class HighScoreScreen implements Screen{
+public class HighScoreScreen implements Screen {
 
     MyGdxGame game;
 
@@ -38,10 +44,10 @@ public class HighScoreScreen implements Screen{
     final float GAME_WORLD_HEIGHT = 1920;
     private Stage stage;
 
-    int highScore;
-    int score;
+    int highScore = highScorePutter();
+    int score = new PlayScreen().getScore();
 
-    float scale = 1.0f*Gdx.graphics.getWidth()/GAME_WORLD_WIDTH;
+    float scale = 1.0f * Gdx.graphics.getWidth() / GAME_WORLD_WIDTH;
 
     //Assets
     Texture backgroundReplayTexture;
@@ -83,15 +89,10 @@ public class HighScoreScreen implements Screen{
     Label yourScoreTextLabel;
 
 
-
-
     BitmapFont currentScoreText;
 
 
-
-
-
-    public HighScoreScreen(MyGdxGame game){
+    public HighScoreScreen(MyGdxGame game) {
         this.game = game;
     }
 
@@ -122,7 +123,7 @@ public class HighScoreScreen implements Screen{
         facebookButtonStyle.down = new TextureRegionDrawable(new TextureRegion(facebookButtonTexture));
         facebookButton = new Button(facebookButtonStyle);
         facebookButton.setSize(121, 121);
-        facebookButton.setPosition(270-(121/2), 946-(121/2));
+        facebookButton.setPosition(270 - (121 / 2), 946 - (121 / 2));
         facebookButtonActionListener();
 
         //Twitter Button
@@ -133,7 +134,7 @@ public class HighScoreScreen implements Screen{
         twitterButtonStyle.down = new TextureRegionDrawable(new TextureRegion(twitterButtonTexture));
         twitterButton = new Button(twitterButtonStyle);
         twitterButton.setSize(121, 121);
-        twitterButton.setPosition(810-(121/2), 946-(121/2));
+        twitterButton.setPosition(810 - (121 / 2), 946 - (121 / 2));
         twitterButtonActionListener();
 
         //Home Button
@@ -144,7 +145,7 @@ public class HighScoreScreen implements Screen{
         homeButtonStyle.down = new TextureRegionDrawable(new TextureRegion(homeButtonTexture));
         homeButton = new Button(homeButtonStyle);
         homeButton.setSize(121, 121);
-        homeButton.setPosition(540-(121/2), 946-(121/2));
+        homeButton.setPosition(540 - (121 / 2), 946 - (121 / 2));
         homeButtonActionListener();
 
         //Replay Button
@@ -154,7 +155,7 @@ public class HighScoreScreen implements Screen{
         replayButtonStyle.up = new TextureRegionDrawable(new TextureRegion(replayButtonTexture));
         replayButtonStyle.down = new TextureRegionDrawable(new TextureRegion(replayButtonTexture));
         replayButton = new Button(replayButtonStyle);
-        replayButton.setPosition(540-replayButton.getWidth()/2, 710 - replayButton.getHeight()/2);
+        replayButton.setPosition(540 - replayButton.getWidth() / 2, 710 - replayButton.getHeight() / 2);
         replayButtonActionListener();
 
         //Legitness Button
@@ -164,7 +165,7 @@ public class HighScoreScreen implements Screen{
         legitnessButtonStyle.up = new TextureRegionDrawable(new TextureRegion(legitnessButtonButtonTexture));
         legitnessButtonStyle.down = new TextureRegionDrawable(new TextureRegion(legitnessButtonButtonTexture));
         legitnessButtonButton = new Button(legitnessButtonStyle);
-        legitnessButtonButton.setPosition(540-legitnessButtonButton.getWidth()/2, 502.02f-legitnessButtonButton.getHeight()/2);
+        legitnessButtonButton.setPosition(540 - legitnessButtonButton.getWidth() / 2, 502.02f - legitnessButtonButton.getHeight() / 2);
 
         //Font Generator
         generator = new FreeTypeFontGenerator(Gdx.files.internal("./Universal Assets/Porter Medium.ttf"));
@@ -178,21 +179,21 @@ public class HighScoreScreen implements Screen{
         yourScoreTextLabelStyle = new Label.LabelStyle(yourScoreTextFont, Color.BLACK);
         yourScoreTextLabel = new Label("YOUR SCORE", yourScoreTextLabelStyle);
         yourScoreTextLabel.setAlignment(3);
-        yourScoreTextLabel.setPosition(540 - yourScoreTextLabel.getWidth()/2, 1700f - yourScoreTextLabel.getHeight()/2);
+        yourScoreTextLabel.setPosition(540 - yourScoreTextLabel.getWidth() / 2, 1700f - yourScoreTextLabel.getHeight() / 2);
 
         //High Score Text
         highScoreTextFont = generator.generateFont(120);
         highScoreTextLabelStyle = new Label.LabelStyle(highScoreTextFont, Color.BLACK);
-        highScoreTextLabel = new Label("HIGH SCORE: " + String.valueOf(highScore) , highScoreTextLabelStyle);
+        highScoreTextLabel = new Label("HIGH SCORE: " + String.valueOf(highScore), highScoreTextLabelStyle);
         highScoreTextLabel.setAlignment(3);
-        highScoreTextLabel.setPosition(540 - highScoreTextLabel.getWidth()/2, 1119 - highScoreTextLabel.getHeight()/2);
+        highScoreTextLabel.setPosition(540 - highScoreTextLabel.getWidth() / 2, 1119 - highScoreTextLabel.getHeight() / 2);
 
         //Current Score Text
         currentScoreTextFont = generator.generateFont(535);
         currentScoreTextLabelStyle = new Label.LabelStyle(currentScoreTextFont, Color.RED);
         currentScoreTextLabel = new Label(String.valueOf(score), currentScoreTextLabelStyle);
         currentScoreTextLabel.setAlignment(3);
-        currentScoreTextLabel.setPosition(540 - currentScoreTextLabel.getWidth()/2, 1422- currentScoreTextLabel.getHeight()/2);
+        currentScoreTextLabel.setPosition(540 - currentScoreTextLabel.getWidth() / 2, 1422 - currentScoreTextLabel.getHeight() / 2);
 
 
         legitnessSong.play();
@@ -246,14 +247,14 @@ public class HighScoreScreen implements Screen{
 
     }
 
-    public void facebookButtonActionListener(){
-        facebookButton.addListener(new ClickListener(){
-           public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
+    public void facebookButtonActionListener() {
+        facebookButton.addListener(new ClickListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 
-               return true;
-           }
+                return true;
+            }
 
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button){
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("Facebook Button pressed");
                 legitnessSong.stop();
             }
@@ -261,14 +262,15 @@ public class HighScoreScreen implements Screen{
         });
 
     }
-    public void homeButtonActionListener(){
-        homeButton.addListener(new ClickListener(){
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
+
+    public void homeButtonActionListener() {
+        homeButton.addListener(new ClickListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 
                 return true;
             }
 
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button){
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("Home Button Pressed");
                 legitnessSong.stop();
                 game.setScreen(new MainMenuScreen(game));
@@ -277,14 +279,15 @@ public class HighScoreScreen implements Screen{
         });
 
     }
-    public void twitterButtonActionListener(){
-        twitterButton.addListener(new ClickListener(){
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
+
+    public void twitterButtonActionListener() {
+        twitterButton.addListener(new ClickListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 
                 return true;
             }
 
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button){
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("Twitter Button Pressed");
                 legitnessSong.stop();
 
@@ -293,20 +296,34 @@ public class HighScoreScreen implements Screen{
         });
 
     }
-    public void replayButtonActionListener(){
-        replayButton.addListener(new ClickListener(){
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
+
+    public void replayButtonActionListener() {
+        replayButton.addListener(new ClickListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 
                 clickSound.play();
                 return true;
             }
 
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button){
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 legitnessSong.stop();
+                new PlayScreen().setScore(0);
                 game.setScreen(new PlayScreen(game));
             }
 
         });
 
+    }
+
+    public int highScorePutter() {
+        int leHighScore;
+        try {
+            BufferedReader in = new BufferedReader(new FileReader("./High Score Directory/High Score.txt"));
+            leHighScore = Integer.valueOf(in.readLine());
+            return leHighScore;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 }
